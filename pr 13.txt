@@ -1,0 +1,32 @@
+create table student (
+  roll varchar(10) primary key,
+  name varchar(50),
+  attendance number,
+  status varchar(20)
+);
+/
+
+INSERT INTO student VALUES ('s01', 'arun', 65, NULL);
+INSERT INTO student VALUES ('s02', 'meera', 80, NULL);
+INSERT INTO student VALUES ('s03', 'gopal', 90, NULL);
+INSERT INTO student VALUES ('s04', 'maya', 55, NULL);
+INSERT INTO student VALUES ('s05', 'anita', 75, NULL);
+
+
+ CREATE OR REPLACE PROCEDURE checkAttendance(r student.roll%type) IS   v_roll student.roll%TYPE;
+ v_att  student.attendance%TYPE;
+ BEGIN
+  v_roll := r;
+ SELECT attendance INTO v_att FROM student WHERE roll = v_roll;
+  IF v_att < 75 THEN
+ UPDATE student SET status = 'detained' WHERE roll = v_roll;
+ DBMS_OUTPUT.PUT_LINE('Term not granted');
+ ELSE
+ UPDATE student SET status = 'not detained' WHERE roll = v_roll;
+ DBMS_OUTPUT.PUT_LINE('Term granted');
+ END IF;
+ EXCEPTION
+ WHEN NO_DATA_FOUND THEN
+ DBMS_OUTPUT.PUT_LINE('Student not found');
+ END;
+ /

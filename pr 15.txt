@@ -1,0 +1,41 @@
+create table o_rollcall (
+  roll_no varchar(10),
+  name varchar(50)
+);
+
+
+
+create table n_rollcall (
+  roll_no varchar(10),
+  name varchar(50)
+);
+
+INSERT INTO o_rollcall VALUES ('r1', 'arun');
+INSERT INTO o_rollcall VALUES ('r2', 'meera');
+INSERT INTO o_rollcall VALUES ('r3', 'gopal');
+INSERT INTO o_rollcall VALUES ('r4', 'maya');
+
+INSERT INTO n_rollcall VALUES ('r3', 'gopal');
+INSERT INTO n_rollcall VALUES ('r4', 'maya');
+INSERT INTO n_rollcall VALUES ('r5', 'rajesh');
+INSERT INTO n_rollcall VALUES ('r6', 'anita');
+
+
+declare
+  cursor c1 is select * from n_rollcall;
+  v_row c1%rowtype;
+begin
+  open c1;
+  loop
+    fetch c1 into v_row;
+    exit when c1%notfound;
+    begin
+      insert into o_rollcall values (v_row.roll_no, v_row.name);
+    exception
+      when dup_val_on_index then
+        null;
+    end;
+  end loop;
+  close c1;
+end;
+/

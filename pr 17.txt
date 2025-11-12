@@ -1,0 +1,27 @@
+create table customber (
+  id varchar(10) primary key,
+  name varchar(50),
+  age number,
+  address varchar(100),
+  salary number
+);
+
+
+INSERT INTO customber VALUES ('c1', 'arun', 28, 'pune', 55000);
+INSERT INTO customber VALUES ('c2', 'meera', 30, 'mumbai', 60000);
+INSERT INTO customber VALUES ('c3', 'gopal', 25, 'delhi', 45000);
+INSERT INTO customber VALUES ('c4', 'maya', 26, 'pune', 48000);
+INSERT INTO customber VALUES ('c5', 'rajesh', 27, 'nagpur', 70000);
+
+create or replace trigger trg_customer_changes
+after insert or update or delete on customber
+for each row
+declare
+  diff number;
+begin
+  if updating then
+    diff := :new.salary - :old.salary;
+    dbms_output.put_line('salary difference: ' || diff);
+  end if;
+end;
+/

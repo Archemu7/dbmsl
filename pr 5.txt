@@ -1,0 +1,111 @@
+create table branch (
+  branch_name varchar(50) primary key,
+  branch_city varchar(50) not null,
+  assets numeric(15,2) check (assets >= 0)
+);
+
+create table account (
+  acc_no varchar(20) primary key,
+  branch_name varchar(50) not null,
+  balance numeric(15,2) check (balance >= 0),
+  foreign key (branch_name) references branch(branch_name)
+);
+
+create table customer (
+  cust_name varchar(50) primary key,
+  cust_street varchar(100),
+  cust_city varchar(50)
+);
+
+create table depositor (
+  cust_name varchar(50) not null,
+  acc_no varchar(20) not null,
+  primary key (cust_name, acc_no),
+  foreign key (cust_name) references customer(cust_name),
+  foreign key (acc_no) references account(acc_no)
+);
+
+create table loan (
+  loan_no varchar(20) primary key,
+  branch_name varchar(50) not null,
+  amount numeric(15,2) check (amount >= 0),
+  foreign key (branch_name) references branch(branch_name)
+);
+
+create table borrower (
+  cust_name varchar(50) not null,
+  loan_no varchar(20) not null,
+  primary key (cust_name, loan_no),
+  foreign key (cust_name) references customer(cust_name),
+  foreign key (loan_no) references loan(loan_no)
+);
+
+INSERT INTO branch VALUES ('akurdi', 'pune', 5000000);
+INSERT INTO branch VALUES ('shivaji nagar', 'pune', 3500000);
+INSERT INTO branch VALUES ('baner', 'pune', 4200000);
+INSERT INTO branch VALUES ('kothrud', 'pune', 2800000);
+
+INSERT INTO account VALUES ('a1001', 'akurdi', 20000);
+INSERT INTO account VALUES ('a1002', 'akurdi', 12000);
+INSERT INTO account VALUES ('a1003', 'shivaji nagar', 5000);
+INSERT INTO account VALUES ('a1004', 'baner', 30000);
+INSERT INTO account VALUES ('a1005', 'kothrud', 18000);
+INSERT INTO account VALUES ('a1006', 'shivaji nagar', 25000);
+
+INSERT INTO customer VALUES ('ram', 'mg road', 'pune');
+INSERT INTO customer VALUES ('sita', 'shivaji road', 'pune');
+INSERT INTO customer VALUES ('gopal', 'market road', 'pune');
+INSERT INTO customer VALUES ('maya', 'station road', 'mumbai');
+INSERT INTO customer VALUES ('rajesh', 'pimpri road', 'pune');
+INSERT INTO customer VALUES ('anita', 'koregaon park', 'pune');
+
+INSERT INTO depositor VALUES ('ram', 'a1001');
+INSERT INTO depositor VALUES ('sita', 'a1003');
+INSERT INTO depositor VALUES ('gopal', 'a1004');
+INSERT INTO depositor VALUES ('maya', 'a1005');
+INSERT INTO depositor VALUES ('rajesh', 'a1002');
+
+
+INSERT INTO loan VALUES ('l2001', 'shivaji nagar', 15000);
+INSERT INTO loan VALUES ('l2002', 'akurdi', 10000);
+INSERT INTO loan VALUES ('l2003', 'shivaji nagar', 13000);
+INSERT INTO loan VALUES ('l2004', 'baner', 1400);
+INSERT INTO loan VALUES ('l2005', 'kothrud', 20000);
+INSERT INTO loan VALUES ('l2006', 'akurdi', 16000);
+
+
+INSERT INTO borrower VALUES ('gopal', 'l2001');
+INSERT INTO borrower VALUES ('ram', 'l2002');
+INSERT INTO borrower VALUES ('sita', 'l2003');
+INSERT INTO borrower VALUES ('anita', 'l2004');
+INSERT INTO borrower VALUES ('rajesh', 'l2005');
+INSERT INTO borrower VALUES ('gopal', 'l2006');
+
+
+
+select c.cust_name, a.acc_no, a.balance
+from customer c
+join depositor d on c.cust_name = d.cust_name
+join account a on d.acc_no = a.acc_no;
+
+select c.cust_name, b.loan_no
+from customer c
+left join borrower b on c.cust_name = b.cust_name;
+
+select a.acc_no, d.cust_name
+from depositor d
+right join account a on d.acc_no = a.acc_no;
+
+select c.cust_name, a.acc_no, b.loan_no
+from customer c
+full join depositor d on c.cust_name = d.cust_name
+full join borrower b on c.cust_name = b.cust_name
+full join account a on d.acc_no = a.acc_no;
+
+select cust_name from borrower
+where loan_no in (select loan_no from loan where amount > 12000);
+
+create or replace view cust_loan_view as
+select b.cust_name, l.loan_no, l.amount
+from borrower b
+join loan l on b.loan_no = l.loan_no;
